@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>上传图片</title>
+    <style>
+        #dropbox {
+            display: none;
+            margin: 15px;
+            width: 600px;
+            height: 300px;
+            outline: 5px solid gray;
+        }
+    </style>
+</head>
+<body>
+    <form id="uploadForm" enctype="multipart/form-data" method="post">
+        <input type="file" id="fileElem" multiple="multiple" accept="image/*" /><br />
+        <button>send</button><br />
+        <progress id="progress"></progress><br />
+        <div id="fileList">
+            <p>No files selected!</p>
+        </div>
+        <div id="preview"></div>
+        <div id="dropbox">
+            <div></div>
+            拖放到这里
+        </div>
+    </form>
+    <script src="../Scripts/jquery-1.7.2.min.js"></script>
+    <script src="jquery.easyUpload.js"></script>
+    <script>
+        var eu = new window.easyUpload('#fileElem', {
+            form: $('#uploadForm'),
+            url: '../Handles/PhotoUploadHandler.ashx',
+            type: 'base64', // form、base64、binary
+            onAbort: function () {
+                console.log('onAbort');
+            },
+            onError: function () {
+                console.log('onError');
+            },
+            onLoadStart: function () {
+                console.log('onLoadStart');
+                $('#progress').val(0);
+            },
+            onLoadEnd: function () {
+                console.log('onLoadEnd');
+                $('#progress').val(0)
+            },
+            onProgress: function (that, percent) {
+                console.log('onProgress');
+                console.log(percent);
+                if (percent < 100) {
+                    $('#progress').val(percent);
+                }
+            },
+            onLoad: function () {
+                console.log('onLoad');
+                // alert('上传成功');
+            },
+            onPreview: function (files) {
+                console.log(files);
+                var list = document.createElement("ul");
+                for (var i = 0; i < files.length; i++) {
+                    var li = document.createElement("li");
+                    list.appendChild(li);
+
+                    var img = document.createElement("img");
+                    img.src = files[i].src;
+                    img.classList.add("obj");
+                    img.file = files[i];
+                    img.width = 50;
+                    img.height = 50;
+                    dropbox.appendChild(img);
+                    img.onload = function (e) {
+                        //console.log(srcArr[i]);
+                    };
+
+                    li.appendChild(img);
+
+                    var info = document.createElement("span");
+                    info.innerHTML = files[i].name + ": " + files[i].size + " bytes";
+                    li.appendChild(info);
+                }
+                document.getElementById('fileList').appendChild(list);
+                // document.getElementById('fileList').style.display = "none";
+            }
+        });
+
+        $('button').click(function (e) {
+            e.preventDefault();
+            eu.upload();
+        });
+    </script>
+</body>
+</html>
